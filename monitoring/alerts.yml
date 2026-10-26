@@ -1,0 +1,53 @@
+groups:
+  - name: volops
+    rules:
+      - alert: VolopsApiDown
+        expr: up{job="volops-api"} == 0
+        for: 2m
+        labels: {severity: page}
+        annotations:
+          summary: "volops API is not reachable"
+
+      - alert: VolopsDataStale
+        # ECB publishes on TARGET working days: a long weekend plus a missed ingest is the usual cause beyond 4 days.
+        expr: volops_data_age_days > 4
+        for: 30m
+        labels: {severity: ticket}
+        annotations:
+          summary: "Rate store is {{ $value }} days old; the ingest job is probably failing"
+
+      - alert: VolopsRetrainRecommended
+        expr: volops_monitor_retrain_recommended == 1
+        for: 1h
+        labels: {severity: ticket}
+        annotations:
+          summary: "Monitor recommends retraining: the model is no longer beating the benchmark out of sample"
+
+      - alert: VolopsInputDrift
+        # advisory: for this model drift is common and not itself a sign of lost accuracy
+        expr: volops_monitor_drift_share > 0.5
+        for: 1d
+        labels: {severity: info}
+        annotations:
+          summary: "More than half of the model's inputs have drifted from the training reference (check accuracy panel)"
+
+      - alert: VolopsMonitorStale
+        expr: volops_monitor_age_seconds > 3 * 86400
+        for: 1h
+        labels: {severity: ticket}
+        annotations:
+          summary: "The monitor job has not produced a report for 3 days"
+
+      - alert: VolopsHighLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(volops_request_seconds_bucket[5m]))) > 0.5
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: "p95 request latency above 500 ms"
+
+      - alert: VolopsErrorRate
+        expr: sum(rate(volops_requests_total{status=~"5.."}[5m])) / sum(rate(volops_requests_total[5m])) > 0.05
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: "More than 5% of requests are failing"

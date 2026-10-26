@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "volops"
+version = "0.1.0"
+description = "An MLOps pipeline around one forecasting model that works: FX volatility. MLflow tracking and registry, a gated champion model, a monitored FastAPI service, drift and performance monitoring, Prometheus/Grafana, Kubernetes manifests, CI/CD"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2,<3",  # evidently does not yet support pandas 3
+    "scipy>=1.11",
+    "httpx>=0.27",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "prometheus-client>=0.20",
+    "mlflow-skinny>=2.14",
+    "typer>=0.12",
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+train = ["mlflow>=2.14", "evidently>=0.4.30", "matplotlib>=3.8"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.scripts]
+volops = "volops.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::FutureWarning"]
+
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B905", "E501"]

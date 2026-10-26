@@ -1,0 +1,250 @@
+{
+  "as_of": "2026-10-26",
+  "data_age_days": 0,
+  "window": 250,
+  "model": {
+    "replay_trained_through_row": 6884,
+    "data_last_date_seen": "2025-08-22"
+  },
+  "performance": {
+    "USD/5": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.3670979177498843,
+      "dm_p": 7.019801347861234e-17,
+      "qlike_model": -10.308288420926997,
+      "qlike_benchmark": -9.941190503177113
+    },
+    "USD/20": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.3379286944448747,
+      "dm_p": 2.8705193577727446e-12,
+      "qlike_model": -10.278543123986774,
+      "qlike_benchmark": -9.940614429541899
+    },
+    "GBP/5": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.634291776254349,
+      "dm_p": 2.4265907210102736e-54,
+      "qlike_model": -11.127930601263,
+      "qlike_benchmark": -10.49363882500865
+    },
+    "GBP/20": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.535029904755211,
+      "dm_p": 1.7873038484303721e-31,
+      "qlike_model": -11.023205817757844,
+      "qlike_benchmark": -10.488175913002634
+    },
+    "JPY/5": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.30835804625873564,
+      "dm_p": 0.00038388597703280296,
+      "qlike_model": -9.863481891430038,
+      "qlike_benchmark": -9.555123845171302
+    },
+    "JPY/20": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.3157921690339851,
+      "dm_p": 3.712063538482977e-10,
+      "qlike_model": -9.869190827548483,
+      "qlike_benchmark": -9.553398658514498
+    },
+    "CHF/5": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.07459502601225232,
+      "dm_p": 1.5853886211678813e-13,
+      "qlike_model": -10.74889947590357,
+      "qlike_benchmark": -10.674304449891318
+    },
+    "CHF/20": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.05899759520702119,
+      "dm_p": 3.710141044890939e-17,
+      "qlike_model": -10.751832075152437,
+      "qlike_benchmark": -10.692834479945416
+    },
+    "CNY/5": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.5391664583301115,
+      "dm_p": 2.716075714702186e-29,
+      "qlike_model": -10.643857166061068,
+      "qlike_benchmark": -10.104690707730956
+    },
+    "CNY/20": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.5111164743730381,
+      "dm_p": 7.972174365292638e-24,
+      "qlike_model": -10.617273315033874,
+      "qlike_benchmark": -10.106156840660836
+    },
+    "AUD/5": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.36973039014505815,
+      "dm_p": 3.857430094636566e-17,
+      "qlike_model": -10.166019362654286,
+      "qlike_benchmark": -9.796288972509227
+    },
+    "AUD/20": {
+      "basis": "out_of_sample",
+      "n_out_of_sample": 250,
+      "n": 250,
+      "qlike_gain": 0.2923640064976887,
+      "dm_p": 3.875302483313582e-15,
+      "qlike_model": -10.097752850860731,
+      "qlike_benchmark": -9.805388844363042
+    }
+  },
+  "mean_qlike_gain": 0.36203903825518413,
+  "series_judged_out_of_sample": 12,
+  "share_series_not_beating_benchmark": 0.0,
+  "drift": {
+    "USD/rv_1": {
+      "ks": 0.16166666666666663,
+      "p": 0.01429603005761864,
+      "drifted": false
+    },
+    "USD/rv_5": {
+      "ks": 0.27583333333333326,
+      "p": 1.1237767692274174e-06,
+      "drifted": true
+    },
+    "USD/rv_22": {
+      "ks": 0.5716666666666665,
+      "p": 1.4517717419943695e-28,
+      "drifted": true
+    },
+    "USD/rv_66": {
+      "ks": 0.5458333333333333,
+      "p": 6.511847221022326e-26,
+      "drifted": true
+    },
+    "GBP/rv_1": {
+      "ks": 0.18666666666666665,
+      "p": 0.0027782947632132207,
+      "drifted": false
+    },
+    "GBP/rv_5": {
+      "ks": 0.3683333333333333,
+      "p": 1.1474493317229296e-11,
+      "drifted": true
+    },
+    "GBP/rv_22": {
+      "ks": 0.755,
+      "p": 8.188272650774167e-53,
+      "drifted": true
+    },
+    "GBP/rv_66": {
+      "ks": 0.8591666666666666,
+      "p": 1.3921958130374668e-72,
+      "drifted": true
+    },
+    "JPY/rv_1": {
+      "ks": 0.2741666666666666,
+      "p": 1.3384512807330916e-06,
+      "drifted": true
+    },
+    "JPY/rv_5": {
+      "ks": 0.4099999999999999,
+      "p": 1.96589582033307e-14,
+      "drifted": true
+    },
+    "JPY/rv_22": {
+      "ks": 0.3025,
+      "p": 5.8830514509498646e-08,
+      "drifted": true
+    },
+    "JPY/rv_66": {
+      "ks": 0.6425,
+      "p": 1.0257975810268588e-36,
+      "drifted": true
+    },
+    "CHF/rv_1": {
+      "ks": 0.1741666666666667,
+      "p": 0.006492716888919092,
+      "drifted": false
+    },
+    "CHF/rv_5": {
+      "ks": 0.29000000000000004,
+      "p": 2.43056474121282e-07,
+      "drifted": true
+    },
+    "CHF/rv_22": {
+      "ks": 0.6883333333333332,
+      "p": 9.368624277491402e-43,
+      "drifted": true
+    },
+    "CHF/rv_66": {
+      "ks": 0.8583333333333333,
+      "p": 2.1304541513104698e-72,
+      "drifted": true
+    },
+    "CNY/rv_1": {
+      "ks": 0.18333333333333324,
+      "p": 0.003504453288023128,
+      "drifted": false
+    },
+    "CNY/rv_5": {
+      "ks": 0.3191666666666667,
+      "p": 8.032671079939761e-09,
+      "drifted": true
+    },
+    "CNY/rv_22": {
+      "ks": 0.565,
+      "p": 7.274637861824971e-28,
+      "drifted": true
+    },
+    "CNY/rv_66": {
+      "ks": 0.8633333333333333,
+      "p": 1.6369510860015144e-73,
+      "drifted": true
+    },
+    "AUD/rv_1": {
+      "ks": 0.16749999999999998,
+      "p": 0.009964539907314605,
+      "drifted": false
+    },
+    "AUD/rv_5": {
+      "ks": 0.3108333333333333,
+      "p": 2.2051837672864946e-08,
+      "drifted": true
+    },
+    "AUD/rv_22": {
+      "ks": 0.7075,
+      "p": 1.7593349292900862e-45,
+      "drifted": true
+    },
+    "AUD/rv_66": {
+      "ks": 0.6816666666666666,
+      "p": 7.782887701498838e-42,
+      "drifted": true
+    }
+  },
+  "drift_share": 0.7916666666666666,
+  "retrain_recommended": false,
+  "reasons": [],
+  "warnings": [
+    "79% of input features drifted from the training reference (advisory: accuracy, not drift, decides retraining)"
+  ]
+}

@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: volops
+resources:
+  - base.yaml
+  - jobs.yaml
+# CI replaces these with the image built from the commit (see .github/workflows/release.yml)
+images:
+  - name: volops-api
+    newName: ghcr.io/OWNER/volops-api
+    newTag: latest
+  - name: volops-train
+    newName: ghcr.io/OWNER/volops-train
+    newTag: latest

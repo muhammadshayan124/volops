@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+mlflow.db
+mlruns/
+mlartifacts/
+data/monitor.json
+data/drift.html
+data/*.tmp

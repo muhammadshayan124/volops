@@ -1,0 +1,32 @@
+name: Safety
+
+# Fails the build if a credential is found anywhere in history, or if any commit was made
+# with a personal email instead of a GitHub no-reply address.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Commit identities must be GitHub no-reply addresses
+        run: |
+          git log --all --format='%h %ae %ce' | awk '
+            { for (i = 2; i <= 3; i++)
+                if ($i !~ /(@users\.noreply\.github\.com|^noreply@github\.com|^noreply@anthropic\.com)$/) {
+                  print "commit " $1 " has a non-no-reply identity"; bad = 1 } }
+            END { exit bad }'
+
+      - name: Scan full history for credentials
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

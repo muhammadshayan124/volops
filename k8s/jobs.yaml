@@ -1,0 +1,123 @@
+# One-off: put the bundled history on the empty volume, then top it up from the ECB (`kubectl create job --from` not needed: apply once).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: volops-seed
+  namespace: volops
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: seed
+          image: volops-train
+          command: ["sh", "-c", "cp -n /seed/rates.csv /data/rates.csv && volops ingest --store /data/rates.csv"]
+          resources: {requests: {cpu: 50m, memory: 128Mi}, limits: {memory: 512Mi}}
+          securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}
+          volumeMounts: [{name: data, mountPath: /data}, {name: tmp, mountPath: /tmp}]
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: volops-data}
+        - name: tmp
+          emptyDir: {}
+---
+# Daily ingest after the ECB publishes (about 16:00 CET = 15:00 UTC), then the monitor, and a weekly retrain.
+# concurrencyPolicy Forbid: two ingests must never write the store at once.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: volops-ingest
+  namespace: volops
+spec:
+  schedule: "0 17 * * 1-5"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+          containers:
+            - name: ingest
+              image: volops-train
+              command: ["volops", "ingest", "--store", "/data/rates.csv"]
+              resources: {requests: {cpu: 50m, memory: 128Mi}, limits: {memory: 512Mi}}
+              securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}
+              volumeMounts: [{name: data, mountPath: /data}, {name: tmp, mountPath: /tmp}]
+          volumes:
+            - name: data
+              persistentVolumeClaim: {claimName: volops-data}
+            - name: tmp
+              emptyDir: {}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: volops-monitor
+  namespace: volops
+spec:
+  schedule: "30 17 * * 1-5"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 900
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+          containers:
+            - name: monitor
+              image: volops-train
+              command: ["volops", "monitor", "--store", "/data/rates.csv", "--out", "/data/monitor.json", "--html", "/data/drift.html"]
+              env: [{name: MLFLOW_TRACKING_URI, value: "http://mlflow:5000"}]
+              resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {memory: 1Gi}}
+              securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}
+              volumeMounts: [{name: data, mountPath: /data}, {name: tmp, mountPath: /tmp}]
+          volumes:
+            - name: data
+              persistentVolumeClaim: {claimName: volops-data}
+            - name: tmp
+              emptyDir: {}
+---
+# Retraining registers a candidate and promotes it only if it passes the gate. The API reads the champion at
+# startup, so after a promotion: `kubectl -n volops rollout restart deploy/volops-api`.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: volops-train
+  namespace: volops
+spec:
+  schedule: "0 3 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: Never
+          securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+          containers:
+            - name: train
+              image: volops-train
+              command: ["volops", "train", "--store", "/data/rates.csv"]
+              env: [{name: MLFLOW_TRACKING_URI, value: "http://mlflow:5000"}]
+              resources: {requests: {cpu: 250m, memory: 512Mi}, limits: {memory: 2Gi}}
+              securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}
+              volumeMounts: [{name: data, mountPath: /data, readOnly: true}, {name: tmp, mountPath: /tmp}]
+          volumes:
+            - name: data
+              persistentVolumeClaim: {claimName: volops-data}
+            - name: tmp
+              emptyDir: {}

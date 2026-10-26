@@ -1,0 +1,69 @@
+# Local stack: MLflow tracking/registry, the API, Prometheus and Grafana.
+# Credentials here (Grafana admin) are for a throwaway local stack, bound to loopback only.
+services:
+  mlflow:
+    build: {context: ., target: train}
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts --serve-artifacts
+    volumes: ["mlflow:/mlflow"]
+    ports: ["127.0.0.1:5000:5000"]
+
+  api:
+    build: {context: ., target: serve}
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      VOLOPS_STORE: /data/rates.csv
+      VOLOPS_MONITOR: /data/monitor.json
+    volumes: ["data:/data"]
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on: [mlflow]
+
+  # One-shot jobs: `docker compose run --rm seed`, then `ingest`, `train`, `monitor`
+  seed:
+    build: {context: ., target: train}
+    command: ["sh", "-c", "cp -n /seed/rates.csv /data/rates.csv"]
+    volumes: ["data:/data"]
+    profiles: [jobs]
+  ingest:
+    build: {context: ., target: train}
+    command: ["volops", "ingest", "--store", "/data/rates.csv"]
+    volumes: ["data:/data"]
+    profiles: [jobs]
+  train:
+    build: {context: ., target: train}
+    command: ["volops", "train", "--store", "/data/rates.csv"]
+    environment: {MLFLOW_TRACKING_URI: "http://mlflow:5000"}
+    volumes: ["data:/data"]
+    profiles: [jobs]
+    depends_on: [mlflow]
+  monitor:
+    build: {context: ., target: train}
+    command: ["volops", "monitor", "--store", "/data/rates.csv", "--out", "/data/monitor.json", "--html", "/data/drift.html"]
+    environment: {MLFLOW_TRACKING_URI: "http://mlflow:5000"}
+    volumes: ["data:/data"]
+    profiles: [jobs]
+    depends_on: [mlflow]
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports: ["127.0.0.1:9090:9090"]
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on: [prometheus]
+
+volumes:
+  mlflow:
+  data:
