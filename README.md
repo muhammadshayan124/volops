@@ -8,8 +8,9 @@ not). Everything around it is what a production service needs: experiment tracki
 with a promotion gate, an API, monitoring that catches both input drift and real accuracy loss,
 dashboards and alerts, containers, Kubernetes manifests and CI/CD.
 
-> **Scope, stated plainly.** This runs end to end on a laptop under Docker Compose, and the Kubernetes
-> manifests are schema-validated. It has **not** been deployed to a cloud cluster, has no users, and
+> **Scope, stated plainly.** This runs end to end on a laptop under Docker Compose (verified: MLflow container,
+> training run promoted through the gate, API serving the champion, Prometheus scraping it with all 7 alert rules
+> loading, Grafana dashboard provisioned), and the Kubernetes manifests are schema-validated. It has **not** been deployed to a cloud cluster, has no users, and
 > carries no traffic. The point is a working, tested pipeline and the engineering judgement in it, not a
 > claim of production scale.
 
@@ -135,6 +136,7 @@ API: `GET /forecast/{currency}?horizon=5|20`, `GET /forecast?horizon=`, `/health
 ## Limitations
 
 - **Not deployed anywhere.** Manifests are schema-validated (`kubeconform`, 14 resources), not run on a cluster here.
+  Compose was run for real; MLflow 3 needs `--allowed-hosts` for in-network Host headers (found by running it, now in both Compose and the Deployment).
 - **No authentication** on the API, and the Compose Grafana password is a throwaway for a loopback-only stack.
 - **SQLite-backed MLflow** (fine for one writer; the Deployment uses `Recreate` for that reason). A shared
   Postgres backend and object-store artifacts would be the next step for more than one trainer.

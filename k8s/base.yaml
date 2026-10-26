@@ -48,7 +48,8 @@ spec:
           image: volops-train
           command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000",
                     "--backend-store-uri", "sqlite:////mlflow/mlflow.db",
-                    "--artifacts-destination", "/mlflow/artifacts", "--serve-artifacts"]
+                    "--artifacts-destination", "/mlflow/artifacts", "--serve-artifacts",
+                    "--allowed-hosts", "mlflow:5000,mlflow.volops.svc.cluster.local:5000,localhost:5000"]
           ports: [{containerPort: 5000, name: http}]
           readinessProbe: {httpGet: {path: /health, port: http}, periodSeconds: 10}
           livenessProbe: {httpGet: {path: /health, port: http}, initialDelaySeconds: 30, periodSeconds: 20}
