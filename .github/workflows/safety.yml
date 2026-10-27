@@ -26,7 +26,9 @@ jobs:
                   print "commit " $1 " has a non-no-reply identity"; bad = 1 } }
             END { exit bad }'
 
+      # Run gitleaks over the whole history directly. (The gitleaks GitHub Action derives a "<first commit>^..HEAD" range for a push, which
+      # does not exist when the first commit of a new repository is the root commit, and then exits non-zero without having scanned anything.)
       - name: Scan full history for credentials
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker run --rm -v "$PWD:/repo" --entrypoint sh ghcr.io/gitleaks/gitleaks:v8.21.2 \
+            -c "git config --global --add safe.directory /repo && gitleaks detect --source /repo --redact --no-banner --verbose"

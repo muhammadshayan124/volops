@@ -43,8 +43,8 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - name: Build both image targets (no push)
         run: |
-          docker buildx build --target train -t volops-train:ci .
-          docker buildx build --target serve -t volops-api:ci .
+          docker buildx build --load --target train -t volops-train:ci .
+          docker buildx build --load --target serve -t volops-api:ci .
       - name: The API image starts, reports not-ready without a model, and stays alive
         run: |
           docker run -d --name api -p 8000:8000 volops-api:ci
